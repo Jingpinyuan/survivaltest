@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭生存力挑戰</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: url('https://images.unsplash.com/photo-1552928285-8c463049504b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .question { font-size: 20px; margin-bottom: 20px; }
+  .choice {
+    display: block;
+    margin: 10px 0;
+    padding: 12px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .choice:hover { background: #ccc; }
+  .start-btn, .restart-btn {
+    padding: 12px 24px;
+    font-size: 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .start-btn:hover, .restart-btn:hover { background: #45a049; }
+  .hidden { display: none; }
+  .share-buttons {
+    margin-top: 20px;
+  }
+  .share-btn {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .line-btn { background-color: #00c300; color: white; }
+  .fb-btn { background-color: #1877F2; color: white; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div id="start-screen">
+  <img src="C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\logo-01.jpg" alt="logo-01.jpg" style="width: 100%; border-radius: 100px; margin-bottom: 200px;">
+    <h1>家庭生存力挑戰</h1>
+    <p>面對地震、火災、水災或颱風，你和家人能冷靜應對嗎？</p>
+    <button class="start-btn" onclick="startQuiz()">開始測驗</button>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div id="question" class="question"></div>
+    <div id="choices"></div>
+  </div>
+
+  <div id="result-screen" class="hidden">
+    <h2>你的家庭災難生存指數是：</h2>
+    <div id="result-text" style="font-size: 22px; margin: 20px 0;"></div>
+    <div class="share-buttons">
+      <button class="share-btn line-btn" onclick="shareLine()">分享到 LINE</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">分享到 Facebook</button>
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">再玩一次</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    question: "地震來襲，家中劇烈搖晃，物品紛紛掉落。你第一個反應是？",
+    image: "https://drive.google.com/file/d/1i-YQmEW_Htm_Z_nqdFtidVBdLtU98uB4/view?usp=drive_link",
+    choices: [
+      { text: "感到恐慌，呆住不動", score: 1 },
+      { text: "迅速蹲下並保護頭部，同時提醒家人", score: 4 },
+      { text: "撥打電話聯絡家人", score: 3 },
+      { text: "急忙收拾物品準備逃跑", score: 2 }
+    ]
+  },
+  {
+    question: "深夜廚房火災突發，濃煙四起，你的反應是？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q2.png",
+    choices: [
+      { text: "獨自衝出火場，忽略其他人", score: 1 },
+      { text: "與家人依計劃撤離", score: 3 },
+      { text: "先通知消防隊並協助家人撤離", score: 4 },
+      { text: "嘗試滅火但最後還是撤離", score: 2 }
+    ]
+  },
+  {
+    question: "暴雨引發水災，水位急升時你的選擇是？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q3.png",
+    choices: [
+      { text: "留在室內靜待救援", score: 1 },
+      { text: "攜帶應急包前往高地避難", score: 4 },
+      { text: "穿越低窪區域撤離", score: 2 },
+      { text: "與家人保持聯絡等待指示", score: 3 }
+    ]
+  },
+  {
+    question: "颱風來襲，全家的應對是？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q4.png",
+    choices: [
+      { text: "提前加固門窗並收好物品", score: 4 },
+      { text: "風雨中匆忙收拾財物", score: 1 },
+      { text: "臨時決定撤離，計劃混亂", score: 2 },
+      { text: "按計劃待在家中安全區域", score: 3 }
+    ]
+  },
+  {
+    question: "手機訊號時斷時續，怎麼辦？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q5.png",
+    choices: [
+      { text: "只靠手機聯絡，結果失聯", score: 1 },
+      { text: "預設集合地點並使用備用通訊", score: 4 },
+      { text: "依直覺尋找集合地", score: 2 },
+      { text: "使用社區公告系統協助聯絡", score: 3 }
+    ]
+  },
+  {
+    question: "家中的應急包情況？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q6.png",
+    choices: [
+      { text: "從未準備，臨時應變", score: 1 },
+      { text: "定期更新應急包且全家確認", score: 4 },
+      { text: "只準備部分物資", score: 2 },
+      { text: "偶爾準備，但無完整規劃", score: 3 }
+    ]
+  },
+  {
+    question: "急救知識方面，全家情況？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q7.png",
+    choices: [
+      { text: "對急救一無所知", score: 2 },
+      { text: "全家接受過急救訓練", score: 4 },
+      { text: "僅了解理論知識", score: 1 },
+      { text: "部分成員懂急救", score: 3 }
+    ]
+  },
+  {
+    question: "災後情緒管理，全家表現？",
+    image: "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\Q8.png",
+    choices: [
+      { text: "彼此支持，冷靜面對", score: 4 },
+      { text: "部分成員能控制情緒", score: 3 },
+      { text: "努力互助但偶爾失控", score: 2 },
+      { text: "情緒波動大，常失控", score: 1 }
+    ]
+  }
+];
+
+let currentQuestion = 0;
+let totalScore = 0;
+let finalResult = "";
+
+function startQuiz() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  const questionEl = document.getElementById('question');
+  const choicesEl = document.getElementById('choices');
+  const current = questions[currentQuestion];
+
+  questionEl.innerHTML = `
+    <img src="${current.image}" alt="題目圖片" style="width:100%; border-radius:10px; margin-bottom:20px;">
+    <div>${current.question}</div>
+  `;
+  
+  choicesEl.innerHTML = '';
+
+  current.choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.classList.add('choice');
+    btn.textContent = choice.text;
+    btn.onclick = () => selectChoice(choice.score);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function selectChoice(score) {
+  totalScore += score;
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+
+  const resultText = document.getElementById('result-text');
+  let resultImage = '';
+
+  if (totalScore >= 28) {
+    finalResult = "超強家庭防災隊！你的準備堪稱模範，生存力極強！";
+    resultImage = "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\R1.png";
+  } else if (totalScore >= 21) {
+    finalResult = "不錯，但還能更好！有基本防災概念，但需加強細節。";
+    resultImage = "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\R2.png";
+  } else if (totalScore >= 15) {
+    finalResult = "要加油了！面對災難風險仍高，請盡快補強應變計畫。";
+    resultImage = "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\R3.png";
+  } else {
+    finalResult = "請立即行動！目前準備不足，建議從基本防災開始。";
+    resultImage = "C:\Users\User\Desktop\京品源\企劃\測試你在災害中的生存率\R4.png";
+  }
+  resultText.innerHTML = `
+    <img src="${resultImage}" alt="結果圖片" style="width:100%; border-radius:10px; margin-bottom:20px;">
+    <div>${finalResult.replace(/\n/g, "<br>")}</div>
+  `;
+}
+
+function restartQuiz() {
+  currentQuestion = 0;
+  totalScore = 0;
+  finalResult = "";
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+}
+
+function shareLine() {
+  const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent("我的災難生存指數結果是：「" + finalResult + "」")}`;
+  window.open(lineUrl, '_blank');
+}
+
+function shareFacebook() {
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent("我的災難生存指數結果是：「" + finalResult + "」")}`;
+  window.open(fbUrl, '_blank');
+}
+</script>
+
+</body>
+</html>
